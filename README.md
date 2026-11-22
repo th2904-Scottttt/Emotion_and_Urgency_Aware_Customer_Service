@@ -34,6 +34,17 @@ To compare a new pair of prediction files, pass `--openai-file PATH` and `--qwen
 
 Start kernels for notebooks 02 and 03 inside the cloned repository. Both resolve files relative to `CAI_Pipline/`. Set `OPENAI_API_KEY` in the kernel environment before running judge cells. Rerunning training writes to the pair and adapter paths used by the notebook.
 
+## Run the RAG demo
+
+Install the inference dependencies in a Python 3.11 virtual environment, then run one query from the repository root.
+
+```sh
+python -m pip install -r requirements-rag.txt
+python scripts/run_rag_demo.py --question "How do I request a return label?" --emotion neutral --urgency low
+```
+
+The command uses the checked-in final DPO adapter and two synthetic example conversations. The first run downloads the Qwen base model and MiniLM embeddings. Pass `--model-path PATH` for another compatible adapter and `--csv FILE [FILE ...]` for your own conversation CSVs. Include the columns `conversationId`, `authorRole`, and `utterance`, in dialogue order. Retrieval uses local documents by default. To allow the notebook’s keyword and similarity fallback to send the question to Tavily, supply `--web-search` and set `TAVILY_API_KEY`.
+
 ## Current scope
 
 The RAG demo takes a question and supplied emotion and urgency labels. Its 18 example scenarios exercise generation with those labels. Connecting the classifiers to the demo and evaluating responses against merchant policies are open steps. The training and demo notebooks reference dataset and adapter paths from the original environment.
