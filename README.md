@@ -18,7 +18,7 @@ To compare a new pair of prediction files, pass `--openai-file PATH` and `--qwen
 
 | Directory | Contents |
 | --- | --- |
-| [message_classification 2](message_classification%202/) | Scripts to classify MultiDOGO utterances by urgency and emotion. |
+| [src/customer_service/classification](src/customer_service/classification/) | Provider-specific agents to classify MultiDOGO utterances by urgency and emotion. |
 | [scripts](scripts/) | Command to compare saved classifier predictions. |
 | [results/classifier_agreement](results/classifier_agreement/) | Saved GPT-4o mini and Qwen predictions used in the comparison. |
 | [CAI_Pipline](CAI_Pipline/) | Saved CAI input data, generated preference pairs, and model adapters. |
@@ -34,6 +34,12 @@ To compare a new pair of prediction files, pass `--openai-file PATH` and `--qwen
 
 Start kernels for notebooks 02 and 03 inside the cloned repository. Both resolve files relative to `CAI_Pipline/`. Set `OPENAI_API_KEY` in the kernel environment before running judge cells. Rerunning training writes to the pair and adapter paths used by the notebook.
 
+## Run the classifiers
+
+Install the classifier package from the repository root with `python -m pip install -e ".[classification]"`. Run `python scripts/classify_multidogo.py` with `OPENAI_API_KEY` set for GPT-4o mini, or `python scripts/classify_multidogo_qwen.py` with `DASHSCOPE_API_KEY` set for hosted Qwen. Each command loads MultiDOGO and writes new predictions in the working directory.
+
+Run the offline repository checks with `python -m unittest discover -s tests`.
+
 ## Run the RAG demo
 
 Install the inference dependencies in a Python 3.11 virtual environment, then run one query from the repository root.
@@ -43,8 +49,16 @@ python -m pip install -r requirements-rag.txt
 python scripts/run_rag_demo.py --question "How do I request a return label?" --emotion neutral --urgency low
 ```
 
+For a shared environment with both classifiers and generation, install both sets of dependencies together with `python -m pip install -r requirements-rag.txt -e ".[classification]"`. To reuse model downloads across runs, set `HF_HOME` to a persistent local directory.
+
 The command uses the checked-in final DPO adapter and two synthetic example conversations. The first run downloads the Qwen base model and MiniLM embeddings. Pass `--model-path PATH` for another compatible adapter and `--csv FILE [FILE ...]` for your own conversation CSVs. Include the columns `conversationId`, `authorRole`, and `utterance`, in dialogue order. Retrieval uses local documents by default. To allow the notebook’s keyword and similarity fallback to send the question to Tavily, supply `--web-search` and set `TAVILY_API_KEY`.
 
 ## Current scope
 
 The RAG demo takes a question and supplied emotion and urgency labels. Its 18 example scenarios exercise generation with those labels. Connecting the classifiers to the demo and evaluating responses against merchant policies are open steps. The training and demo notebooks reference dataset and adapter paths from the original environment.
+
+## Validation status
+
+The demo ran locally on CPU with Qwen2.5-1.5B and the bundled adapter. On the synthetic return-label example, retrieval surfaced the correct instruction. Base Qwen followed it, while the bundled adapter requested personal information unrelated to the task. Treat this demo as a research prototype.
+
+The bundled domain, SFT, and DPO adapters have identical weight files. The training notebook now loads the SFT and DPO policy adapters as trainable and checks for trainable LoRA parameters. A local one-step run of each trainer changed all 224 LoRA tensors. A short SFT pilot still failed the return-label example. Full retraining and response-quality evaluation are pending.

@@ -1,25 +1,31 @@
 """
-Classify messages using Qwen2.5
+Classify messages from MultiDOGO dataset.
 """
 
 from datasets import load_dataset
-from agents.qwen_urgency_agent import QwenUrgencyAgent
-from agents.qwen_emotional_agent import QwenEmotionalAgent
+from customer_service.classification import UrgencyAgent, EmotionalAgent
 import json
 
 
-def classify_messages_qwen(num_samples=100, save_path=None):
+def classify_messages(num_samples=100, save_path=None):
     """
-    Classify messages using Qwen2.5.
+    Classify messages from MultiDOGO dataset.
+    
+    Args:
+        num_samples: Number of messages to classify
+        save_path: Path to save results (optional)
+        
+    Returns:
+        List of classification results
     """
     print("Loading dataset...")
     ds = load_dataset("jpcorb20/multidogo")
     data = ds["train"]
     
-    print(f"Classifying {num_samples} messages with Qwen2.5...")
+    print(f"Classifying {num_samples} messages...")
     
-    urgency_agent = QwenUrgencyAgent()
-    emotional_agent = QwenEmotionalAgent()
+    urgency_agent = UrgencyAgent()
+    emotional_agent = EmotionalAgent()
     
     results = []
     
@@ -61,7 +67,7 @@ def classify_messages_qwen(num_samples=100, save_path=None):
 
 
 if __name__ == "__main__":
-    results = classify_messages_qwen(num_samples=100, save_path="results_qwen.json")
+    results = classify_messages(num_samples=100, save_path="results.json")
     
     print("\nSample results:")
     for r in results[:3]:
