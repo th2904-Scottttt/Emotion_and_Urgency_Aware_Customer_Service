@@ -2,7 +2,9 @@
 Compare OpenAI vs Qwen classification results
 """
 
+import argparse
 import json
+from pathlib import Path
 
 
 def load_results(filepath):
@@ -112,4 +114,9 @@ def compare_results(openai_file, qwen_file):
 
 
 if __name__ == "__main__":
-    compare_results("results.json", "results_qwen.json")
+    results_dir = Path(__file__).resolve().parents[1] / "results" / "classifier_agreement"
+    parser = argparse.ArgumentParser(description="Compare saved OpenAI and Qwen predictions.")
+    parser.add_argument("--openai-file", type=Path, default=results_dir / "results.json")
+    parser.add_argument("--qwen-file", type=Path, default=results_dir / "results_qwen.json")
+    args = parser.parse_args()
+    compare_results(args.openai_file, args.qwen_file)
