@@ -21,8 +21,18 @@ To compare a new pair of prediction files, pass `--openai-file PATH` and `--qwen
 | [message_classification 2](message_classification%202/) | Scripts to classify MultiDOGO utterances by urgency and emotion. |
 | [scripts](scripts/) | Command to compare saved classifier predictions. |
 | [results/classifier_agreement](results/classifier_agreement/) | Saved GPT-4o mini and Qwen predictions used in the comparison. |
-| [CAI_Pipline](CAI_Pipline/) | A constitution for customer-service replies, notebooks for generating draft and revised replies, supervised fine-tuning and preference training, and saved model adapters. |
-| [Rag+Tune](Rag%2BTune/) | Initial domain fine-tuning and a RAG demo that retrieves similar conversations and generates replies with a Qwen model. |
+| [CAI_Pipline](CAI_Pipline/) | Saved CAI input data, generated preference pairs, and model adapters. |
+| [Rag+Tune](Rag%2BTune/) | Initial adapter and a RAG demo that retrieves similar conversations and generates replies with a Qwen model. |
+
+## Training and preference analysis
+
+| Notebook | Inputs and outputs |
+| --- | --- |
+| [01 Domain fine-tuning](notebooks/01_domain_finetuning.ipynb) | The Colab notebook expects a CUDA GPU and five dialogue CSVs listed in `DATASET_PATHS` (airport ticket, fast food, finance, media, and software). Set those paths and `OUTPUT_DIR` for your environment. It saves the initial Qwen LoRA adapter. |
+| [02 Constitutional AI training](notebooks/02_constitutional_ai_training.ipynb) | Reads the [constitution](configs/constitution.json), `CAI_Pipline/results_qwen.json`, and the initial adapter in `CAI_Pipline/qwen2-1.5b-finetuned/`. Builds draft/revision pairs, trains a supervised adapter, then trains a preference adapter using GPT-4o mini judgments. |
+| [03 Preference analysis](notebooks/03_preference_analysis.ipynb) | Loads the final DPO adapter and `CAI_Pipline/cai_pairs.jsonl`. Calls the judge to reconstruct preferences and reports revision selections and the tone/urgency text-similarity heuristic. |
+
+Start kernels for notebooks 02 and 03 inside the cloned repository. Both resolve files relative to `CAI_Pipline/`. Set `OPENAI_API_KEY` in the kernel environment before running judge cells. Rerunning training writes to the pair and adapter paths used by the notebook.
 
 ## Current scope
 
