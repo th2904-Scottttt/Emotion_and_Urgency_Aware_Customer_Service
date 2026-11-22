@@ -5,13 +5,9 @@ Urgency Classification Agent
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.json_parser import extract_json
+from .json_parser import extract_json
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 PROMPT_URGENCY = """
@@ -37,7 +33,7 @@ class UrgencyAgent:
         self.model = model
         self.temperature = temperature
         self.verbose = verbose
-        self.client = client
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         
     def classify(self, text):
         """Classify urgency level."""
