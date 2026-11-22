@@ -1,0 +1,5 @@
+conversationId,authorRole,utterance
+demo-1,customer,How do I request a return label?
+demo-1,agent,Open the order details and choose Request return label.
+demo-2,customer,How do I update my delivery instructions?
+demo-2,agent,Open the order details and select Delivery instructions.
